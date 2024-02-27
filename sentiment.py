@@ -1,7 +1,18 @@
 from transformers import pipeline
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-classifier = pipeline("sentiment-analysis",   
-                      "blanchefort/rubert-base-cased-sentiment")
+class Item(BaseModel):
+    text: str
 
-print(classifier("Я обожаю инженерию машинного обучения!"))
-print('Новые изменения')
+
+app = FastAPI()
+classifier = pipeline('sentiment-analysis')
+
+@app.get("/")
+def root():
+    return {'message':'Hello, world!!!'}
+
+@app.post("/predict/")
+def predict(item:Item):
+    return classifier(item.text)[0]
